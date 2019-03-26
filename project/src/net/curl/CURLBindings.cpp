@@ -611,7 +611,7 @@ namespace lime {
 					value _bytes = bytes->Value ((value)bytesRoot->Get ());
 
 					curl_gc_mutex.Unlock ();
-					length = val_int ((value)writeCallback->Call (_bytes));
+					length = val_int ((value)writeCallback->Call (_bytes, alloc_int (position)));
 					curl_gc_mutex.Lock ();
 
 					if (length == CURL_WRITEFUNC_PAUSE) {
@@ -707,7 +707,7 @@ namespace lime {
 					ValuePointer* writeCallback = writeCallbacks[easy_handle];
 
 					Bytes* bytes = writeBytes[easy_handle];
-					if (bytes->length > position) bytes->Resize (position);
+					if (bytes->length < position) bytes->Resize (position);
 					memcpy ((char*)bytes->b, buffer, position);
 					// free (buffer);
 					// writeBuffers[easy_handle] = NULL;
@@ -715,7 +715,7 @@ namespace lime {
 					writeBufferPosition[easy_handle] = 0;
 
 					curl_gc_mutex.Unlock ();
-					length = *((int*)writeCallback->Call (bytes));
+					length = *((int*)writeCallback->Call (bytes, &position));
 					curl_gc_mutex.Lock ();
 
 					if (length == CURL_WRITEFUNC_PAUSE) {
@@ -1051,7 +1051,7 @@ namespace lime {
 		curlObjects[curl] = handle;
 
 		writeBuffers[handle] = NULL;
-		writeBufferPosition[handle] = false;
+		writeBufferPosition[handle] = 0;
 		writeBufferSize[handle] = 0;
 
 		curl_gc_mutex.Unlock ();
@@ -2188,7 +2188,10 @@ namespace lime {
 	HL_PRIM vbyte* hl_lime_curl_easy_strerror (int errornum) {
 
 		const char* result = curl_easy_strerror ((CURLcode)errornum);
-		return (vbyte*)result;
+		int length = strlen (result);
+		char* _result = (char*)malloc (length + 1);
+		strcpy (_result, result);
+		return (vbyte*)_result;
 
 	}
 
@@ -2204,7 +2207,10 @@ namespace lime {
 	HL_PRIM vbyte* hl_lime_curl_easy_unescape (HL_CFFIPointer* curl, hl_vstring* url, int inlength, int outlength) {
 
 		char* result = curl_easy_unescape ((CURL*)curl->ptr, url ? hl_to_utf8 (url->bytes) : NULL, inlength, &outlength);
-		return (vbyte*)result;
+		int length = strlen (result);
+		char* _result = (char*)malloc (length + 1);
+		strcpy (_result, result);
+		return (vbyte*)_result;
 
 	}
 
@@ -2751,7 +2757,10 @@ namespace lime {
 	HL_PRIM vbyte* hl_lime_curl_version () {
 
 		char* result = curl_version ();
-		return (vbyte*)result;
+		int length = strlen (result);
+		char* _result = (char*)malloc (length + 1);
+		strcpy (_result, result);
+		return (vbyte*)_result;
 
 	}
 
