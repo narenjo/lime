@@ -278,10 +278,9 @@
 
 		<section if="LIME_ZLIB">
 
-			<compilerflag value="-DSTATIC_LINK" if="emscripten" />
+			<compilerflag value="-DSTATIC_LINK" if="emscripten || ios || tvos" />
 			<compilerflag value="-DLIME_ZLIB" />
 
-			<file name="${HXCPP}/project/libs/zlib/ZLib.cpp" if="emscripten || ios || static_link || tvos" />
 			<file name="src/utils/compress/Zlib.cpp" />
 
 		</section>
@@ -503,6 +502,7 @@
 				<vflag name="-framework" value="AudioUnit" />
 				<vflag name="-framework" value="OpenAL"/>
 				<vflag name="-framework" value="GameController"/>
+				<vflag name="-framework" value="CoreBluetooth" />
 
 				<lib name="-ldl" />
 				<lib name="-lEGL" />
@@ -522,6 +522,7 @@
 				<vflag name="-framework" value="OpenAL"/>
 				<vflag name="-framework" value="CoreMotion"/>
 				<vflag name="-framework" value="CoreText"/>
+				<vflag name="-framework" value="CoreBluetooth" />
 
 				<lib name="-ldl" />
 				<lib name="-lEGL" />
